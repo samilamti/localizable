@@ -1,0 +1,26 @@
+﻿@model IEnumerable<Localizable.Models.TranslateModel>
+
+@{
+    ViewBag.Title = "Translate";
+}
+
+<h2>Translate</h2>
+@foreach(var pair in Model)
+{
+    <div>@pair.Key</div>
+    <div>
+        <input type="text" class="translationText" name="value@(pair.ValueId)" value="@pair.Value" data-lang="@ViewBag.Language"/>
+    </div>
+    <br/>
+}
+
+<script>
+    $(function () {
+        $("input.translationText").change(function () {
+            var textBox = $(this);
+            $.post('@Url.Action("Translate")', { key: textBox.attr("name"), value: textBox.val(), lang: textBox.data("lang") }, function () {
+                textBox.css({ backgroundColor: "mediumseagreen" });
+            });
+        });
+    });
+</script>

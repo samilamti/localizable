@@ -1,0 +1,61 @@
+﻿@model System.Collections.Generic.List<Models.TranslationKey>
+
+@{
+    ViewBag.Title = "Keys";
+}
+
+<h2>Keys</h2>
+
+<ul>
+    @foreach(var key in Model)
+    {
+        <li/>
+        <a href="#" class="key-link" id="link@(key.Id)" data-keyId="@key.Id">@key.Key</a>
+        <table>
+            @foreach (var translation in key.Translations.OrderByDescending(t => t.UpVotes-t.DownVotes))
+            {
+                <tr>
+                    <td>@translation.Language</td>
+                    <td>@translation.Value</td>
+                    <td id="translationRelativeScore@(translation.Id)">@(translation.UpVotes-translation.DownVotes)</td>
+                    <td><a href="#" class="up-vote" data-translationId="@translation.Id">+</a></td>
+                    <td><a href="#" class="up-vote" data-translationId="@translation.Id">-</a></td>
+                </tr>
+            }
+        </table>
+        <div id="values@(key.Id)"></div>
+    }
+</ul>
+
+<script>
+    $(function () {
+        $("a.key-link").click(function () {
+            var id = $(this).data("keyId");
+
+            $.getJSON('@Url.Action("Translations")', { id: id }, function (data) {
+                var target = $("#values" + id);
+                var list = $("<ul/>");
+
+                for (var i = 0; i < data.length; i++) {
+                    $("<li>" + data[i] + "</li>").appendTo(list);
+                }
+
+                list.appendTo(target);
+                target.fadeIn();
+            });
+
+            return false;
+        });
+
+        $("a.up-vote").click(function () {
+            var id = $(this).data("translationId");
+            $.post('@Url.Action("UpVote")', { id: id }, function (data) {
+                $("#translationRelativeScore" + id).text(data);
+            });
+            return false;
+        });
+
+        $("a.up-vote").button();
+        $("a.down-vote").button();
+    });
+</script>
