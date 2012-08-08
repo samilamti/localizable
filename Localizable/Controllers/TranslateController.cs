@@ -15,13 +15,15 @@ namespace Localizable.Controllers
 
         public ActionResult Index(string language)
         {
-            ViewBag.Language = language;
+            var ret = new TranslateModel {Language = language};
             using (var context = new DatabaseContext())
             {
                 var untranslatedKeys =
                     context.Keys.Where(key => !key.Translations.Any(translation => translation.Language == language));
-                return View(untranslatedKeys.Select(key => new TranslateModel { Key = key.Key, ValueId = key.Id }).ToList());
+                ret.Translations = new List<TranslationModel>(untranslatedKeys.Select(key => new TranslationModel() { Key = key.Key, ValueId = key.Id }).ToList());
             }
+
+            return View(ret);
         }
 
         [HttpPost]

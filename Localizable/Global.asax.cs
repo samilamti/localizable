@@ -19,9 +19,9 @@ namespace Localizable
             routes.IgnoreRoute("{resource}.axd/{*pathInfo}");
 
             routes.MapRoute("New translation", "Translate/Translate",
-                            new {controller = "Translate", action = "Translate", lang = "se"});
-            routes.MapRoute("Translate", "Translate/{lang}",
-                            new {controller = "Translate", action = "Index", lang = "se"});
+                            new {controller = "Translate", action = "Translate" });
+            routes.MapRoute("Translate", "Translate/{language}",
+                            new {controller = "Translate", action = "Index", language = "se"});
 
             routes.MapRoute(
                 "Default", // Route name

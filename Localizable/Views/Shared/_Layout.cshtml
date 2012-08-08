@@ -13,23 +13,82 @@
     <div class="page">
         <header>
             <div id="title">
-                <h1>My MVC Application</h1>
+                <b style="font-size: x-large; color: white">Localizable</b>
+                <p style="font-style: italic; color: white; margin-top: -5px">- the online community for high-quality app translations!</p>
             </div>
             <div id="logindisplay">
                 @Html.Partial("_LogOnPartial")
             </div>
-            <nav>
-                <ul id="menu">
-                    <li>@Html.ActionLink("Home", "Index", "Home")</li>
-                    <li>@Html.ActionLink("About", "About", "Home")</li>
-                </ul>
-            </nav>
+        <br/>
         </header>
         <section id="main">
+                <h3 style="text-align: center">Translate a...</h3>
+            <div>
+                <a href="/translate/dll" class="button">.dll-file</a>
+                <a href="/translate/strings" class="button">.strings-file</a>
+                <a href="/translate/resx" class="button">.resx-file</a>
+                <a href="/translate/search" class="button">single word or phrase</a>
+            </div>
+            <h3 style="text-align: center">Help us</h3>
+            <div>
+                <a href="/translate" class="button">
+                    Provide your translation services
+                </a>
+                <a href="/list" class="button">
+                    Vote on contributed translations
+                </a>
+            </div>
+            <h3 style="text-align: center">About</h3>
+            <div>
+            <a href="/about" class="button">
+                How does this work?
+            </a>
+            </div>
+            <h3 style="text-align: center">Other services</h3>
+            <div>
+            <a href="/resources" class="button">
+                Developer resources
+            </a>
+            <a href="/translators-corner" class="button">
+                Translators' corner (forum)
+            </a>
+            </div>
             @RenderBody()
         </section>
         <footer>
         </footer>
     </div>
+    <script>
+        $(function () {
+            $(".button")
+                .button()
+            /*
+                .click(function () {
+                    var source = $(this);
+                    var sourceUrl = $(this).attr("href");
+                    var links = [];
+                    $("#menu div a").each(function () {
+                        if ($(this).attr("href") == sourceUrl)
+                            $(this).css({ border: "blue 1px solid", opacity: 1 });
+                        else
+                            $(this).fadeTo("normal", .5).css({border: "none"});
+                    });
+                    $.get(sourceUrl, null, function (data) {
+                        $("#main").html(data);
+                    });
+                    return false;
+                })*/;
+        });
+
+        function slideMenu(links, index, callback) {
+            if (links.length == index) {
+                callback();
+                return;
+            }
+            links[index].fadeOut("fast", function () {
+                slideMenu(links, index + 1, callback);
+            });
+        }
+    </script>
 </body>
 </html>

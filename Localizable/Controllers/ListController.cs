@@ -4,6 +4,7 @@ using System.Linq;
 using System.Data.Entity;
 using System.Web;
 using System.Web.Mvc;
+using Localizable.Models;
 
 namespace Localizable.Controllers
 {
@@ -29,14 +30,18 @@ namespace Localizable.Controllers
             }
         }
 
-        public JsonResult UpVote(int id)
+        public JsonResult Vote(int translation, string direction)
         {
             using (var context = new DatabaseContext())
             {
-                var translation = context.Values.Find(id);
-                translation.UpVotes++;
+                var t = context.Values.Find(translation);
+                if (direction == "up")
+                    t.UpVotes++;
+                else if (direction == "down")
+                    t.DownVotes++;
+                t.RelativeScore = t.UpVotes - t.DownVotes;
                 context.SaveChanges();
-                return Json(translation.UpVotes - translation.DownVotes);
+                return Json(t.RelativeScore);
             }
         }
     }

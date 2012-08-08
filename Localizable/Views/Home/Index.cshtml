@@ -1,8 +1,15 @@
 ﻿@{
     ViewBag.Title = "Home Page";
+    
+    if (Session["e-mail"] != null)
+    {
+        Response.Write("<p/>" + Session["e-mail"]);
+    }
+    if (Session["fullName"] != null)
+    {
+        Response.Write("<p/>" + Session["fullName"]);
+    }
 }
 
-<h2>@ViewBag.Message</h2>
-<p>
-    To learn more about ASP.NET MVC visit <a href="http://asp.net/mvc" title="ASP.NET MVC Website">http://asp.net/mvc</a>.
-</p>
+
+    @{ Html.RenderAction("Index", "List"); }
