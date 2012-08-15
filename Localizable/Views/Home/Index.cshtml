@@ -1,15 +1,25 @@
 ﻿@{
     ViewBag.Title = "Home Page";
-    
-    if (Session["e-mail"] != null)
-    {
-        Response.Write("<p/>" + Session["e-mail"]);
-    }
-    if (Session["fullName"] != null)
-    {
-        Response.Write("<p/>" + Session["fullName"]);
-    }
 }
-
-
-    @{ Html.RenderAction("Index", "List"); }
+<h3>Translate a...</h3>
+<div>
+    <a href="/translate/file" class="button">MonoTouch .dll-file</a>
+    <a href="/translate/file" class="button">iOS/OSX .strings-file</a>
+    <a href="/translate/file" class="button">iOS/OSX .plist-file</a>
+    <a href="/translate/file" class="button">Windows .resx-file</a>
+</div>
+<h3>Help us</h3>
+<div>
+    <a href="@Url.Action("Translate")" class="button">Provide your translation services </a>
+    <a href="@Url.Action("Vote")" class="button">Vote on contributed translations </a>
+</div>
+<h3>About</h3>
+<div>
+    <a href="@Url.Action("About")" class="button">How does this work? </a>
+    <a href="@Url.Action("Credits")" class="button">Credits &amp; attributions </a>
+</div>
+<h3>Other services</h3>
+<div>
+    <a href="/resources" class="button">Developer resources </a>
+    <a href="http://www.facebook.com/translatorscorner" class="button" target="_blank">Translators' corner on Facebook </a>
+</div>

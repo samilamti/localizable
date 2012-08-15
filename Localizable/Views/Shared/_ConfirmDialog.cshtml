@@ -1,0 +1,45 @@
+﻿@model string[]
+           
+<script type="text/javascript">
+    var deleteLinkObject;
+
+    $(function () {
+
+        $('#@Model[0]-dialog').dialog({
+            autoOpen: false,
+            width: 400,
+            resizable: false,
+            modal: true, //Dialog options
+            buttons: {
+                "Ja": function () {
+                    $.post(deleteLinkObject[0].href, function (result) {
+                        if (result.indexOf('/') == 0)
+                            window.location = result;
+                        else if(result == "reload")
+                            window.location = "@Request.Url.OriginalString";
+                        else {
+//                            alert("[" + result + "]");
+                        }
+                        $(this).dialog("close");
+                    });
+                    $(this).dialog("close");
+                },
+                "Nej": function () {
+                    $(this).dialog("close");
+                }
+            }
+        });
+
+        $(".@Model[0]").click(function () {
+            deleteLinkObject = $(this);
+            $("#@Model[0]-dialog").dialog("open");
+            return false;
+        });
+
+
+    });
+</script>
+
+<div id="@Model[0]-dialog" title="Bekräfta">
+    <p /> @Model[1]
+</div>   

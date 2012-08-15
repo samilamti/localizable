@@ -1,0 +1,11 @@
+﻿@model Localizable.Models.LoginToVoteModel
+@{
+    ViewBag.Title = "Please log in to vote";
+}
+<p>
+    <b>Thank you</b> for offering to quality-control our translations by voting for
+    them! However, before we can accept your vote, we kindly ask you to log in through
+    any of our partners below. We do this to ensure that all participants vote only
+    once to maintain the site's overall quality.
+</p>
+@{Html.RenderAction("LogOn", "Oauth");}

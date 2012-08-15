@@ -1,0 +1,24 @@
+﻿    <h3>Log on using ...</h3>
+    
+    <a href="#" class="login button" data-lid="https://www.google.com/accounts/o8/id">Google</a>
+    <a href="#" class="login button" data-lid="https://openid.aol.com/">AOL</a>
+    <a href="#" class="login button" data-lid="https://myopenid.com/">MyOpenID</a>
+    <a href="#" class="login button" data-lid="https://api.myspace.com/openid">MySpace</a>
+    <a href="#" class="login button" data-lid="https://pip.verisignlabs.com/">Verisign</a>
+    <a href="#" class="login button" data-lid="https://me.yahoo.com/">Yahoo!</a>
+    
+    <h3>... or an other OpenID-provider</h3>
+    @Html.TextBox("loginIdentifier", "", new { id = "loginIdentifier" })
+    
+    <p/><input type="submit" value="Login using above"/>
+</form>
+<script>
+    $(function () {
+        $("a.login").click(function () {
+            $("#loginIdentifier").val($(this).data("lid"));
+            $("form").submit();
+            return false;
+        });
+    });
+</script>
+<hr/>

@@ -1,63 +1,55 @@
-﻿@model System.Collections.Generic.List<Models.TranslationKey>
-
+﻿@using Localizable.Models
+@model System.Collections.Generic.List<Models.TranslationKey>
 @{
     ViewBag.Title = "Translations";
     Layout = null;
 }
-
 <p>
-    Please help maintain the high quality translations by voting once per translation (provided you feel qualified to do so).
+    Please help maintain the high quality translations by voting once per translation
+    (provided you feel qualified to do so).
 </p>
-
-<ul>
-    @foreach(var key in Model)
+<table>
+@foreach (var key in Model)
+{
+    <tr>
+        <th colspan="5" style="white-space: nowrap">@key.Key</th>
+    </tr>
+    foreach (var translation in key.Translations.OrderByDescending(t => t.RelativeScore))
     {
-        <li/>
-        <a href="#" class="key-link" id="link@(key.Id)" data-keyId="@key.Id">@key.Key</a>
-        <table style="border: none">
-            @foreach (var translation in key.Translations.OrderByDescending(t => t.RelativeScore))
-            {
-                <tr id="translationRow@(translation.Id)">
-                    <td>@translation.Language</td>
-                    <td>@translation.Value</td>
-                    <td id="translationRelativeScore@(translation.Id)">@(translation.RelativeScore)</td>
-                    <td><a href="#" class="vote button" data-translationId="@translation.Id" data-direction="up">+</a></td>
-                    <td><a href="#" class="vote button" data-translationId="@translation.Id" data-direction="down">-</a></td>
-                </tr>
-            }
-        </table>
-        <div id="values@(key.Id)"></div>
+        <tr id="translationRow@(translation.Id)">
+            <td>@translation.Language
+            </td>
+            <td>@translation.Value
+            </td>
+            <td id="translationRelativeScore@(translation.Id)" style="white-space: nowrap">@(translation.RelativeScore)
+            </td>
+            <td>
+                <a href="@Url.Action("Vote", "Oauth", new { translation = translation.Id, direction = "up" })" class="vote button" data-translationId="@translation.Id" data-direction="up">
+                    +</a>
+            </td>
+            <td>
+                <a href="@Url.Action("Vote", "Oauth", new { translation = translation.Id, direction = "down" })" class="vote button" data-translationId="@translation.Id" data-direction="down">
+                    -</a>
+            </td>
+        </tr>
     }
-</ul>
+    <br />
+}
+</table>
+@if (CurrentUser.IsAuthenticated)
+{
+    <script>
+        $(function () {
+            $("a.vote").click(function () {
+                var $this = $(this);
+                var id = $this.data("translationId");
 
-<script>
-    $(function () {
-        $("a.key-link").click(function () {
-            var id = $(this).data("keyId");
-
-            $.getJSON('@Url.Action("Translations")', { id: id }, function (data) {
-                var target = $("#values" + id);
-                var list = $("<ul/>");
-
-                for (var i = 0; i < data.length; i++) {
-                    $("<li>" + data[i] + "</li>").appendTo(list);
-                }
-
-                list.appendTo(target);
-                target.fadeIn();
+                $.post('@Url.Action("Vote")', { translation: id, direction: $this.data("direction") }, function (data) {
+                    $("#translationRelativeScore" + id).text(data);
+                    $("#translationRow" + id).find("a.vote.button").remove();
+                });
+                return false;
             });
-
-            return false;
         });
-
-        $("a.vote").click(function () {
-            var $this = $(this);
-            var id = $this.data("translationId");
-            $.post('@Url.Action("Vote")', { translation: id, direction: $this.data("direction") }, function (data) {
-                $("#translationRelativeScore" + id).text(data);
-                $("#translationRow" + id).find("a.vote.button").remove();
-            });
-            return false;
-        });
-    });
-</script>
+    </script>
+}

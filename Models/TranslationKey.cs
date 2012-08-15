@@ -7,11 +7,25 @@ namespace Models
     [DataContract]
     public class TranslationKey
     {
-        [DataMember, Key]
+        /// <summary>
+        /// Serialization constructor
+        /// </summary>
+        public TranslationKey() {}
+
+        public TranslationKey(string key, string comment)
+        {
+            Key = key;
+            Comment = comment;
+        }
+
+        [Key]
         public int Id { get; set; }
 
-        [DataMember]
+        [DataMember, StringLength(255)]
         public string Key { get; set; }
+
+        [DataMember, StringLength(1024)]
+        public string Comment { get; set; }
 
         [DataMember]
         public virtual IList<Translation> Translations { get; set; }

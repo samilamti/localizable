@@ -1,0 +1,47 @@
+﻿@using Localizable.Models
+@model Localizable.Models.TranslateModel
+
+@{
+    ViewBag.Title = "Provide your translation services";
+}
+
+<div>
+    [ <b>Untranslated keys</b> | <a href="/list">Vote</a> ]
+</div>
+
+@using (Html.BeginForm())
+{
+    <p>
+        I can help to translate from english to @Html.TextBoxFor(m => m.Language, new { id = "targetLanguage" })
+    </p>
+    if (!String.IsNullOrEmpty(Model.Language))
+    {
+        <p>
+            If you don't feel comfortable in translating a certain field, just leave it blank.
+        </p>
+        @Html.HiddenFor(m => m.Language)
+        for (int index = 0; index < Model.Translations.Count; index++)
+        {
+            <div>@Model.Translations[index].Key</div>
+            <div>
+                @Html.HiddenFor(m => m.Translations[index].Key)
+                @Html.TextBoxFor(m => m.Translations[index].Value)
+            </div>
+            <br/>
+        }
+
+        <hr/>
+        <input type="submit" value="Submit my translations"/>
+    }
+}
+<script>
+    $(function () {
+        $("#targetLanguage").autocomplete({
+            // http://en.wikipedia.org/wiki/List_of_ISO_639-1_codes
+            source: [{ label: 'аҧсуа бызшәа, аҧсшәа', value: 'ab' }, { label: 'Afaraf', value: 'aa' }, { label: 'Afrikaans', value: 'af' }, { label: 'Akan', value: 'ak' }, { label: 'gjuha shqipe', value: 'sq' }, { label: 'አማርኛ', value: 'am' }, { label: 'العربية', value: 'ar' }, { label: 'aragonés', value: 'an' }, { label: 'Հայերեն', value: 'hy' }, { label: 'অসমীয়া', value: 'as' }, { label: 'авар мацӀ, магӀарул мацӀ', value: 'av' }, { label: 'avesta', value: 'ae' }, { label: 'aymar aru', value: 'ay' }, { label: 'azərbaycan dili', value: 'az' }, { label: 'bamanankan', value: 'bm' }, { label: 'башҡорт теле', value: 'ba' }, { label: 'euskara, euskera', value: 'eu' }, { label: 'беларуская мова', value: 'be' }, { label: 'বাংলা', value: 'bn' }, { label: 'भोजपुरी', value: 'bh' }, { label: 'Bislama', value: 'bi' }, { label: 'bosanski jezik', value: 'bs' }, { label: 'brezhoneg', value: 'br' }, { label: 'български език', value: 'bg' }, { label: 'ဗမာစာ', value: 'my' }, { label: 'català, valencià', value: 'ca' }, { label: 'Chamoru', value: 'ch' }, { label: 'нохчийн мотт', value: 'ce' }, { label: 'chiCheŵa, chinyanja', value: 'ny' }, { label: '中文(Zhōngwén),汉语,漢語', value: 'zh' }, { label: 'чӑваш чӗлхи', value: 'cv' }, { label: 'Kernewek', value: 'kw' }, { label: 'corsu, lingua corsa', value: 'co' }, { label: 'ᓀᐦᐃᔭᐍᐏᐣ', value: 'cr' }, { label: 'hrvatski jezik', value: 'hr' }, { label: 'čeština, český jazyk', value: 'cs' }, { label: 'dansk', value: 'da' }, { label: 'Nederlands, Vlaams', value: 'nl' }, { label: 'རྫོང་ཁ', value: 'dz' }, { label: 'Esperanto', value: 'eo' }, { label: 'eesti, eesti keel', value: 'et' }, { label: 'Eʋegbe', value: 'ee' }, { label: 'føroyskt', value: 'fo' }, { label: 'vosa Vakaviti', value: 'fj' }, { label: 'suomi, suomen kieli', value: 'fi' }, { label: 'français, langue française', value: 'fr' }, { label: 'Fulfulde, Pulaar, Pular', value: 'ff' }, { label: 'galego', value: 'gl' }, { label: 'ქართული', value: 'ka' }, { label: 'Deutsch', value: 'de' }, { label: 'ελληνικά', value: 'el' }, { label: 'Avañeẽ', value: 'gn' }, { label: 'ગુજરાતી', value: 'gu' }, { label: 'Kreyòl ayisyen', value: 'ht' }, { label: 'Otjiherero', value: 'hz' }, { label: 'हिन्दी, हिंदी', value: 'hi' }, { label: 'Hiri Motu', value: 'ho' }, { label: 'Magyar', value: 'hu' }, { label: 'Interlingua', value: 'ia' }, { label: 'Bahasa Indonesia', value: 'id' }, { label: 'Gaeilge', value: 'ga' }, { label: 'Asụsụ Igbo', value: 'ig' }, { label: 'Iñupiaq, Iñupiatun', value: 'ik' }, { label: 'Ido', value: 'io' }, { label: 'Íslenska', value: 'is' }, { label: 'italiano', value: 'it' }, { label: 'ᐃᓄᒃᑎᑐᑦ', value: 'iu' }, { label: '日本語(にほんご)', value: 'ja' }, { label: 'basa Jawa', value: 'jv' }, { label: 'kalaallisut, kalaallit oqaasii', value: 'kl' }, { label: 'ಕನ್ನಡ', value: 'kn' }, { label: 'Kanuri', value: 'kr' }, { label: 'कश्मीरी,كشميري‎', value: 'ks' }, { label: 'қазақ тілі', value: 'kk' }, { label: 'ខ្មែរ, ខេមរភាសា, ភាសាខ្មែរ', value: 'km' }, { label: 'Gĩkũyũ', value: 'ki' }, { label: 'Ikinyarwanda', value: 'rw' }, { label: 'Кыргызча, Кыргыз тили', value: 'ky' }, { label: 'коми кыв', value: 'kv' }, { label: 'KiKongo', value: 'kg' }, { label: '한국어(韓國語),조선어(朝鮮語)', value: 'ko' }, { label: 'Kurdî,كوردی‎', value: 'ku' }, { label: 'Kuanyama', value: 'kj' }, { label: 'latine, lingua latina', value: 'la' }, { label: 'Lëtzebuergesch', value: 'lb' }, { label: 'Luganda', value: 'lg' }, { label: 'Limburgs', value: 'li' }, { label: 'Lingála', value: 'ln' }, { label: 'ພາສາລາວ', value: 'lo' }, { label: 'lietuvių kalba', value: 'lt' }, { label: 'Tshiluba', value: 'lu' }, { label: 'latviešu valoda', value: 'lv' }, { label: 'Gaelg, Gailck', value: 'gv' }, { label: 'македонски јазик', value: 'mk' }, { label: 'fiteny malagasy', value: 'mg' }, { label: 'bahasa Melayu,بهاس ملايو‎', value: 'ms' }, { label: 'മലയാളം', value: 'ml' }, { label: 'Malti', value: 'mt' }, { label: 'te reo Māori', value: 'mi' }, { label: 'मराठी', value: 'mr' }, { label: 'Kajin M̧ajeļ', value: 'mh' }, { label: 'монгол', value: 'mn' }, { label: 'Ekakairũ Naoero', value: 'na' }, { label: 'Diné bizaad, Dinékʼehǰí', value: 'nv' }, { label: 'Norsk bokmål', value: 'nb' }, { label: 'isiNdebele', value: 'nd' }, { label: 'नेपाली', value: 'ne' }, { label: 'Owambo', value: 'ng' }, { label: 'Norsk nynorsk', value: 'nn' }, { label: 'Norsk', value: 'no' }, { label: 'ꆈꌠ꒿ Nuosuhxop', value: 'ii' }, { label: 'isiNdebele', value: 'nr' }, { label: 'occitan, lenga dòc', value: 'oc' }, { label: 'ᐊᓂᔑᓈᐯᒧᐎᓐ', value: 'oj' }, { label: 'ѩзыкъ словѣньскъ', value: 'cu' }, { label: 'Afaan Oromoo', value: 'om' }, { label: 'ଓଡ଼ିଆ', value: 'or' }, { label: 'ирон æвзаг', value: 'os' }, { label: 'ਪੰਜਾਬੀ,پنجابی‎', value: 'pa' }, { label: 'पाऴि', value: 'pi' }, { label: 'فارسی', value: 'fa' }, { label: 'język polski, polszczyzna', value: 'pl' }, { label: 'português', value: 'pt' }, { label: 'Runa Simi, Kichwa', value: 'qu' }, { label: 'rumantsch grischun', value: 'rm' }, { label: 'Ikirundi', value: 'rn' }, { label: 'limba română, limba moldovenească', value: 'ro' }, { label: 'русский язык', value: 'ru' }, { label: 'संस्कृतम्', value: 'sa' }, { label: 'sardu', value: 'sc' }, { label: 'सिन्धी,سنڌي، سندھی‎', value: 'sd' }, { label: 'Davvisámegiella', value: 'se' }, { label: 'gagana faa Samoa', value: 'sm' }, { label: 'yângâ tî sängö', value: 'sg' }, { label: 'српски језик', value: 'sr' }, { label: 'Gàidhlig', value: 'gd' }, { label: 'chiShona', value: 'sn' }, { label: 'සිංහල', value: 'si' }, { label: 'slovenčina, slovenský jazyk', value: 'sk' }, { label: 'slovenski jezik, slovenščina', value: 'sl' }, { label: 'Soomaaliga, af Soomaali', value: 'so' }, { label: 'Sesotho', value: 'st' }, { label: 'español, castellano', value: 'es' }, { label: 'Basa Sunda', value: 'su' }, { label: 'Kiswahili', value: 'sw' }, { label: 'SiSwati', value: 'ss' }, { label: 'Svenska', value: 'sv' }, { label: 'தமிழ்', value: 'ta' }, { label: 'తెలుగు', value: 'te' }, { label: 'тоҷикӣ,toğikī,تاجیکی‎', value: 'tg' }, { label: 'ไทย', value: 'th' }, { label: 'ትግርኛ', value: 'ti' }, { label: 'བོད་ཡིག', value: 'bo' }, { label: 'Türkmen, Түркмен', value: 'tk' }, { label: 'Wikang Tagalog, ᜏᜒᜃᜅ᜔ ᜆᜄᜎᜓᜄ᜔', value: 'tl' }, { label: 'Setswana', value: 'tn' }, { label: 'faka Tonga', value: 'to' }, { label: 'Türkçe', value: 'tr' }, { label: 'Xitsonga', value: 'ts' }, { label: 'татар теле,tatar tele', value: 'tt' }, { label: 'Twi', value: 'tw' }, { label: 'Reo Tahiti', value: 'ty' }, { label: 'Uyƣurqə,ئۇيغۇرچە‎', value: 'ug' }, { label: 'українська мова', value: 'uk' }, { label: 'اردو', value: 'ur' }, { label: 'Ozbek,Ўзбек,أۇزبېك‎', value: 'uz' }, { label: 'Tshivenḓa', value: 've' }, { label: 'Tiếng Việt', value: 'vi' }, { label: 'Ovalingo', value: 'vk' }, { label: 'Volapük', value: 'vo' }, { label: 'walon', value: 'wa' }, { label: 'Cymraeg', value: 'cy' }, { label: 'Wollof', value: 'wo' }, { label: 'Frysk', value: 'fy' }, { label: 'isiXhosa', value: 'xh' }, { label: 'ייִדיש', value: 'yi' }, { label: 'Yorùbá', value: 'yo' }, { label: 'Saɯ cueŋƅ, Saw cuengh', value: 'za'}],
+            select: function (event, ui) {
+                $("form").submit();
+            }
+        });
+    });
+</script>

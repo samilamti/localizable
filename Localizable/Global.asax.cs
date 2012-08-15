@@ -1,6 +1,7 @@
 ﻿using System.Data.Entity;
 using System.Web.Mvc;
 using System.Web.Routing;
+using Localizable.Database;
 
 namespace Localizable
 {
@@ -18,11 +19,6 @@ namespace Localizable
         {
             routes.IgnoreRoute("{resource}.axd/{*pathInfo}");
 
-            routes.MapRoute("New translation", "Translate/Translate",
-                            new {controller = "Translate", action = "Translate" });
-            routes.MapRoute("Translate", "Translate/{language}",
-                            new {controller = "Translate", action = "Index", language = "se"});
-
             routes.MapRoute(
                 "Default", // Route name
                 "{controller}/{action}/{id}", // URL with parameters
@@ -37,7 +33,7 @@ namespace Localizable
             RegisterGlobalFilters(GlobalFilters.Filters);
             RegisterRoutes(RouteTable.Routes);
 
-            Database.SetInitializer(new DropCreateDatabaseIfModelChanges<DatabaseContext>());
+            System.Data.Entity.Database.SetInitializer(new Initializer());
         }
     }
 }

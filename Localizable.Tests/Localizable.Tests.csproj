@@ -51,11 +51,20 @@
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Controllers\HomeControllerTest.cs" />
+    <Compile Include="StringsParserTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\ngenstrings\ngenstrings.csproj">
+      <Project>{8BF570CE-C883-425B-BFA7-F445609313F8}</Project>
+      <Name>ngenstrings</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\LanguageFileParsers\LanguageFileParsers.csproj">
+      <Project>{2B77B2D9-1793-4CEA-9241-163F58B91311}</Project>
+      <Name>LanguageFileParsers</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Localizable\Localizable.csproj">
       <Project>{1152E924-561F-435E-8CAF-BF5E101E2D2A}</Project>
       <Name>Localizable</Name>

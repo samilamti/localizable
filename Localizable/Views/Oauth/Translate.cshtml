@@ -1,0 +1,22 @@
+﻿@model dynamic
+
+@{
+    ViewBag.Title = "Provide your translation services";
+}
+
+<p>
+    <b>Thank you</b> for offering your translation services to us! Before we get started, however, we would love to know a <em>little</em> bit
+    about who we are dealing with. Don't worry though! The process is very simple and only involves logging in with any of our partners below. We
+    need to know this for two reasons:
+    <ol>
+        <li/>First off, we belive that the translations in question will be better, if there is a tie-in to a real person.
+        <li/>Second off, we want to give you credit for your translations when they are used! Whenever your translation is used, your name
+        will be published, whether it is used to produce an awesome app or a web site. That is, unless you explicitly tells us not to.
+    </ol>
+</p>
+
+@{ Html.RenderPartial("_OauthHead"); }
+@*    <input type="hidden" name="returnUrl" value="@Url.Action("Translate", "Home")"/>
+    <input type="checkbox" name="noPublicityThanks"/>
+    <label for="noPublicityThanks">No thank you, I'd like to help people, but would not like any publicity</label> (can be changed later).*@
+@{ Html.RenderPartial("_OauthFoot"); }

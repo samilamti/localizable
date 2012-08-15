@@ -1,0 +1,51 @@
+﻿@using System.Text.RegularExpressions
+@model dynamic
+@{
+    var isIosDevice = Regex.IsMatch(Request != null && Request.UserAgent != null ? Request.UserAgent : "", "Mozilla\\/5.0 \\(iPod|iPad|iPhone.+?\\).*?Mobile");
+}
+<p>
+    For best results, it is <b>strongly recommended</b> that you upload a file where the neutral language is English. To enable as many people as possible to contribute
+    to the site, our goal has been to translate from English to all other languages.
+    
+</p>
+<table style="border: none">
+    <tr>
+        <td style="vertical-align: middle; border: none">
+            @using (Html.BeginForm("Upload", "Translate", FormMethod.Post, new { enctype = "multipart/form-data" }))
+            {
+                <label for="qqfile">Select file: </label>
+                <input type="file" name="qqfile" style="max-width: 120px; max-height: 20px;" id="qqfile" class="button"/>
+                <span id="uploadingMessage">Translating your file ...</span>
+            }
+        </td>
+        <td style="vertical-align: middle; border: none">
+            <img src="@Url.Content("~/Content/Images/instruction-file-content.png")" alt="How-to"/> 
+        </td>
+    </tr>
+</table>
+<p>
+    <h3>What's going to happen?</h3>
+    First off, we will upload the file to our servers. Then, we will run all your keys through our translation engine,
+    substituting your values for localized values in each language we have available. Finally, we will return a suitable
+    set of files in a .zip archive for you to download. You can then import the files in your development environment.
+    
+    <h3>What if you don't have translations for all my keys?</h3>
+    If we lack translations, we will add a comment - <b>needs translation</b> to your key and type in the default value
+    you provided in your upload. To make this process better, you can help us by uploading already translated resource
+    files, which we can use to help others.
+</p>
+
+@if (!isIosDevice)
+{
+    <script type="text/javascript">
+        $(function () {
+            $("#qqfile").change(function () {
+                $("form").submit();
+                $(this).fadeOut(function () {
+                    $("#uploadingMessage").fadeIn();
+                });
+            });
+            $("#uploadingMessage").hide();
+        });
+    </script>
+}

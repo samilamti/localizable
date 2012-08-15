@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
+﻿using System.ComponentModel.DataAnnotations;
 using System.Runtime.Serialization;
-using System.Text;
 
 namespace Models
 {
@@ -16,10 +12,10 @@ namespace Models
         [DataMember]
         public virtual TranslationKey Key { get; set; }
         
-        [DataMember]
+        [DataMember, StringLength(1024)]
         public string Value { get; set; }
         
-        [DataMember]
+        [DataMember, StringLength(1024)]
         public string Comment { get; set; }
 
         [DataMember]
@@ -34,7 +30,7 @@ namespace Models
         [DataMember]
         public virtual Translator Translator { get; set; }
 
-        [DataMember]
+        [DataMember, StringLength(2)]
         public string Language { get; set; }
     }
 }
