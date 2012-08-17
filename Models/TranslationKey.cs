@@ -29,5 +29,8 @@ namespace Models
 
         [DataMember]
         public virtual IList<Translation> Translations { get; set; }
+
+        [DataMember]
+        public int DownVotes { get; set; }
     }
 }

@@ -6,6 +6,8 @@ namespace Localizable.Models
     {
         public string Language { get; set; }
         public IList<TranslationModel> Translations { get; set; }
+
+        public int To { get; set; }
     }
 
     public class TranslationModel
@@ -13,5 +15,9 @@ namespace Localizable.Models
         public string Key { get; set; }
         public int KeyId { get; set; }
         public string Value { get; set; }
+
+        public string Comment { get; set; }
+
+        public bool Untranslatable { get; set; }
     }
 }

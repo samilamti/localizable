@@ -1,0 +1,30 @@
+﻿@model Localizable.Models.TranslateKeyModel
+@{
+    ViewBag.Title = "Add translation";
+}
+@using (Html.BeginForm())
+{
+    @Html.HiddenFor(m => m.KeyId)
+    <p>
+        Add translation to <b>@Model.Text</b> (<em>@Model.Comment</em>)<br />
+        in @Html.TextBoxFor(m => m.Language, new { id = "targetLanguage" })
+    </p>
+
+    <p>
+        Existing translations:
+    </p>
+    <ul>
+        @foreach (var translation in Model.Translations)
+        {
+            <li />@translation
+        }
+    </ul>
+
+    <h3>
+        New translation
+    </h3>
+    @Html.TextBoxFor(m => m.NewTranslation)
+
+    <input type="submit" value="Submit translation" />
+}
+@{ Html.RenderPartial("_targetLanguageAutoComplete"); }

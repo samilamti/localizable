@@ -15,9 +15,6 @@ namespace Models
         [DataMember, StringLength(1024)]
         public string Value { get; set; }
         
-        [DataMember, StringLength(1024)]
-        public string Comment { get; set; }
-
         [DataMember]
         public int UpVotes { get; set; }
 

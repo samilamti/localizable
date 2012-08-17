@@ -2,6 +2,9 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Data.Entity;
+using System.Data;
+using System.Linq.Expressions;
 using System.Text.RegularExpressions;
 using System.Web;
 using System.Web.Mvc;
@@ -33,19 +36,83 @@ namespace Localizable.Controllers
             return inputStream != null;
         }
 
-        [HttpPost]
-        public ActionResult Upload(HttpPostedFileBase qqfile)
+        [HttpPost] public ActionResult UploadTranslatedFile(HttpPostedFileBase file, string language)
         {
-            Stream inputStream;
-            if (!TryGetInputStream(qqfile, out inputStream))
+            if (!Request.IsAuthenticated)
+                return RedirectToAction("UploadTranslatedFile", "Oauth");
+
+           Stream inputStream;
+           if (!TryGetInputStream(file, out inputStream))
             {
-                ModelState.AddModelError("qqfile", "Unable to read file");
+                ModelState.AddModelError("file", "Unable to read file");
                 return new EmptyResult();
             }
 
             var tables = new List<LocalizedStringTable>();
 
-            var fileName = GetFileName(qqfile);
+            var fileName = GetFileName(file);
+
+            if (fileName.EndsWith(".dll"))
+            {
+                tables.AddRange(ngenstrings.MainClass.ParseDll(inputStream).Values);
+            }
+            else
+            {
+                using(var reader = new StreamReader(inputStream))
+                {
+                    tables.Add(StringsParser.ExtractTable(reader.ReadToEnd()));
+                }
+            }
+
+            using (var context = new Context())
+            {
+                var translator = context.GetTranslator(User);
+
+                // 1. Add all keys to db
+                var foundKeys = new List<TranslationKey>();
+                foreach (var source in tables)
+                    foreach (var key in source.Keys)
+                    {
+                        var tkey = context.Keys.FirstOrDefault(tk => tk.Key == key);
+                        if (tkey == null)
+                        {
+                            tkey = new TranslationKey(key, source[key].Comment);
+                            context.Keys.Add(tkey);
+                        }
+                        foundKeys.Add(tkey);
+                        var value = source[key];
+                        if (!String.IsNullOrEmpty(value.Value) &&
+                            !context.Values.Any(v => v.Value == value.Value && v.Language == language))
+                            context.Values.Add(new Translation
+                                                   {
+                                                       Key = tkey, 
+                                                       Value = value.Value, 
+                                                       Language = language,
+                                                       Translator = translator
+                                                   });
+                    }
+                context.SaveChanges();
+            }
+
+            TempData["Message"] = "Thank you!";
+            return RedirectToAction("Index", "Home");
+        }
+
+        [HttpPost]
+        public ActionResult Upload(UploadModel model)
+        {
+            var addValues = Request.IsAuthenticated && !String.IsNullOrEmpty(model.Language);
+
+            Stream inputStream;
+            if (!TryGetInputStream(model.PostedFile, out inputStream))
+            {
+                ModelState.AddModelError("PostedFile", "Unable to read file");
+                return new EmptyResult();
+            }
+
+            var tables = new List<LocalizedStringTable>();
+
+            var fileName = GetFileName(model.PostedFile);
             var outputFormat = GetOutputFormat(fileName);
             var sourceLanguage = GetSourceLanguage(fileName);
 
@@ -63,6 +130,8 @@ namespace Localizable.Controllers
 
             using (var context = new Context())
             {
+                var translator = addValues ? context.GetTranslator(User) : null;
+
                 // 1. Add all keys to db
                 var foundKeys = new List<TranslationKey>();
                 foreach(var source in tables)
@@ -75,17 +144,40 @@ namespace Localizable.Controllers
                         context.Keys.Add(tkey);
                     }
                     foundKeys.Add(tkey);
-                    var value = source[key];
-                    if (!String.IsNullOrEmpty(value.Value) && !context.Values.Any(v => v.Value == value.Value && v.Language == sourceLanguage))
-                        context.Values.Add(new Translation { Key = tkey, Value = value.Value, Language = "en" });
+
+                    if (addValues)
+                    {
+                        var value = source[key];
+                        if (!String.IsNullOrEmpty(value.Value) &&
+                            !context.Values.Any(v => v.Value == value.Value && v.Language == sourceLanguage))
+                            context.Values.Add(new Translation
+                                                   {
+                                                       Key = tkey, 
+                                                       Value = value.Value, 
+                                                       Language = model.Language,
+                                                       Translator = translator
+                                                   });
+                    }
                 }
                 context.SaveChanges();
+
+                if (addValues)
+                {
+                    TempData["Message"] = "Thank you for adding your knowledge to ours!";
+                    return RedirectToAction("Index", "Home");
+                }
 
                 // 2. Produce output
                 var languages = foundKeys
                     .SelectMany(collectionSelector => collectionSelector.Translations)
                     .Select(t => t.Language)
                     .Distinct();
+                var translators = foundKeys
+                    .SelectMany(collectionSelector => collectionSelector.Translations)
+                    .Where(t => t.Translator != null)
+                    .Select(t => t.Translator)
+                    .Distinct()
+                    .Select(t => t.FullName == t.EMail ? t.EMail : String.Format("{0} ({1})", t.FullName, t.EMail));
                 var dict = languages.ToDictionary(language => language, language => new LocalizedStringTable("undefined"));
                 foreach (var translationKey in foundKeys)
                 {
@@ -99,7 +191,7 @@ namespace Localizable.Controllers
 
                         table.Add(key, new LocalizedString
                         {
-                            Comment = translation.Comment ?? translation.Key.Comment,
+                            Comment = translation.Key.Comment,
                             Key = key,
                             Value = translation.Value
                         });
@@ -111,7 +203,7 @@ namespace Localizable.Controllers
                 {
                     foreach (var language in dict.Keys)
                     {
-                        zip.AddEntry(Path.Combine(language, "Localizable.strings"), dict[language].ToString(OutputFormat.Strings));
+                        zip.AddEntry(Path.Combine(language, "Localizable.strings"), dict[language].ToString(outputFormat, String.Join(", ", translators)));
                     }
                     var ms = new MemoryStream();
                     zip.Save(ms);
@@ -143,6 +235,52 @@ namespace Localizable.Controllers
         private string GetFileName(HttpPostedFileBase qqfile)
         {
             return (qqfile == null ? Request.QueryString["qqfile"] : qqfile.FileName).ToLower();
+        }
+
+        public ActionResult Key(int id)
+        {
+            if (!Request.IsAuthenticated)
+                return RedirectToAction("Translate", "Oauth");
+
+            using (var context = new Context())
+            {
+                var key = context.Keys.Find(id);
+                var language = context.GetTranslator(User).Language;
+                var translations = context.Values
+                    .Where(v => v.Key.Id == key.Id && v.Language == language)
+                    .Select(v => v.Value);
+
+                return View(new TranslateKeyModel
+                                {
+                                    KeyId = key.Id,
+                                    Text = key.Key,
+                                    Comment = key.Comment,
+                                    Language = language,
+                                    Translations = translations.ToList()
+                                });
+            }
+        }
+
+        [HttpPost]
+        public ActionResult Key(TranslateKeyModel model)
+        {
+            using (var context = new Context())
+            {
+                var translator = context.GetTranslator(User);
+                translator.Language = model.Language;
+
+                var key = context.Keys.Find(model.KeyId);
+                key.Translations.Add(new Translation
+                                         {
+                                             Language = model.Language, 
+                                             Translator = translator, 
+                                             Value = model.NewTranslation
+                                         });
+                context.SaveChanges();
+                TempData["Message"] = "Thank you!";
+            }
+
+            return RedirectToAction("Vote", "Home");
         }
     }
 }

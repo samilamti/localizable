@@ -9,17 +9,6 @@ namespace Localizable.Controllers
 {
     public class ListController : Controller
     {
-        //
-        // GET: /List/
-
-        public ActionResult Index()
-        {
-            using(var context = new Context())
-            {
-                return View(context.Keys.Include(key =>key.Translations).ToList());    
-            }
-        }
-
         public JsonResult Translations(int id)
         {
             using (var context = new Context())

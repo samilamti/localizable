@@ -3,15 +3,16 @@
 }
 <h3>Translate a...</h3>
 <div>
-    <a href="/translate/file" class="button">MonoTouch .dll-file</a>
+    <a href="/translate/file" class="button tooltip" title="MonoTouch .dll-file">.dll-file</a>
     <a href="/translate/file" class="button">iOS/OSX .strings-file</a>
     <a href="/translate/file" class="button">iOS/OSX .plist-file</a>
     <a href="/translate/file" class="button">Windows .resx-file</a>
 </div>
 <h3>Help us</h3>
 <div>
-    <a href="@Url.Action("Translate")" class="button">Provide your translation services </a>
-    <a href="@Url.Action("Vote")" class="button">Vote on contributed translations </a>
+    <a href="@Url.Action("Translate")" class="button tooltip" title="Provide your translation services">Translate</a>
+    <a href="@Url.Action("Vote")" class="button tooltip" title="Vote on contributed translations">Vote</a>
+    <a href="@Url.Action("ContributeFile")" class="button tooltip" title="Upload a translated resource file ">Upload</a>
 </div>
 <h3>About</h3>
 <div>

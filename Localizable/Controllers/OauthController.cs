@@ -101,5 +101,10 @@ namespace Localizable.Controllers
             FormsAuthentication.SignOut();
             return RedirectToAction("Index", "Home");
         }
+
+        public ActionResult ContributeFile()
+        {
+            return View();
+        }
     }
 }
