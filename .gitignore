@@ -10,3 +10,10 @@ _ReSharper.Localizable
 
 # Automatic backups
 Backup
+
+# Production settings
+Web.Release.config
+
+# Solution Options and User settings
+*.suo
+*.user
