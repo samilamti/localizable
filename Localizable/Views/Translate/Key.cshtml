@@ -24,7 +24,8 @@
         New translation
     </h3>
     @Html.TextBoxFor(m => m.NewTranslation)
+    
 
-    <input type="submit" value="Submit translation" />
+    <a href="javascript:$('form').submit()" id="submitButton" class="button">Submit translation</a>
 }
-@{ Html.RenderPartial("_targetLanguageAutoComplete"); }
+@{ Html.RenderPartial("_targetLanguageAutoComplete", "noautosubmit"); }

@@ -2,6 +2,7 @@
 <html>
 <head>
     <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>@ViewBag.Title</title>
     <link href="@Url.Content("~/Content/Site.css")" rel="stylesheet" type="text/css" />
     <link href="@Url.Content("~/Content/tipTip.css")" rel="stylesheet" type="text/css" />
@@ -11,6 +12,7 @@
     <script src="@Url.Content("~/Scripts/jquery.tipTip.minified.js")" type="text/javascript"></script>
 </head>
 <body>
+    <div id="info"></div>
     <div class="page">
         <header>
             <div id="title">
@@ -19,24 +21,18 @@
                 </a> 
                 <p style="font-style: italic; color: white; margin-top: -5px">- the online community for high-quality app translations!</p>
             </div>
-            <div id="logindisplay">
-                @Html.Partial("_LogOnPartial")
-            </div>
-        <br/>
         </header>
         <section id="main">
-@*            @if (TempData.ContainsKey("Message"))
-            {
-                <div style="background-color: InfoBackground; color: InfoText; padding: 2px; margin: 3px; border: black 1px solid" class="popup">@TempData["Message"]</div>
-            }
-            @if (TempData.ContainsKey("Error"))
-            {
-                <div style="background-color: Red; color: white; font-weight: bold; padding 2px; margin: 3px; border: black 1px solid" class="popup">@TempData["Error"]</div>
-            }
-*@            <div id="info" style="display: none;opacity: 0;position: absolute; display: block; z-index: 2; margin: 100px auto; padding: 5px 10px; text-align: center; max-width: 500px; background-color: lightyellow; border: 1px solid orange"></div>
+            <a href="https://github.com/samilamti/localizable"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_gray_6d6d6d.png" alt="Fork me on GitHub"></a>
             @RenderBody()
         </section>
         <footer>
+
+        @if (Request.IsAuthenticated)
+        {
+            <text>Logged in as <strong>@User.Identity.Name</strong>!
+            [ @Html.ActionLink("Log Off", "LogOff", "Oauth") ]</text>
+        }
         </footer>
     </div>
     <script>
@@ -45,9 +41,9 @@
         $(function () {
             $(".button").button();
             $(".tooltip").tipTip();
-            @if (TempData.Keys.Contains("Message"))
+            @if (TempData.ContainsKey("Message"))
             {
-                <text>info('@Html.Raw((string)TempData["Message"])');</text>
+                <text>info('@Html.Raw(((string)TempData["Message"]).Replace("'", "\\'"))');</text>
             }
 
         });

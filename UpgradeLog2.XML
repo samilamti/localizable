@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?><?xml-stylesheet type='text/xsl' href='_UpgradeReport_Files/UpgradeReport.xslt'?><UpgradeLog>
+<Properties><Property Name="Solution" Value="Localizable">
+</Property><Property Name="Solution File" Value="C:\Users\Sami Lamti\Documents\GitHub\localizable\Localizable.sln">
+</Property><Property Name="Date" Value="den 17 augusti 2012">
+</Property><Property Name="Time" Value="22:50:54">
+</Property><Property Name="Log Number" Value="2">
+</Property></Properties><Event ErrorLevel="0" Project="ngenstrings" Source="..\ngenstrings\ngenstrings.csproj" Description="Project file successfully backed up as C:\Users\Sami Lamti\Documents\GitHub\localizable\Backup\ngenstrings.csproj">
+</Event><Event ErrorLevel="0" Project="ngenstrings" Source="..\ngenstrings\Main.cs" Description="File successfully backed up as C:\Users\Sami Lamti\Documents\GitHub\localizable\Backup\Main.cs">
+</Event><Event ErrorLevel="0" Project="ngenstrings" Source="..\ngenstrings\AssemblyInfo.cs" Description="File successfully backed up as C:\Users\Sami Lamti\Documents\GitHub\localizable\Backup\AssemblyInfo.cs">
+</Event><Event ErrorLevel="0" Project="ngenstrings" Source="..\ngenstrings\MethodSignature.cs" Description="File successfully backed up as C:\Users\Sami Lamti\Documents\GitHub\localizable\Backup\MethodSignature.cs">
+</Event><Event ErrorLevel="0" Project="ngenstrings" Source="..\ngenstrings\ParameterEnum.cs" Description="File successfully backed up as C:\Users\Sami Lamti\Documents\GitHub\localizable\Backup\ParameterEnum.cs">
+</Event><Event ErrorLevel="0" Project="ngenstrings" Source="..\ngenstrings\LocalizedString.cs" Description="File successfully backed up as C:\Users\Sami Lamti\Documents\GitHub\localizable\Backup\LocalizedString.cs">
+</Event><Event ErrorLevel="0" Project="ngenstrings" Source="..\ngenstrings\MethodSignatureCollection.cs" Description="File successfully backed up as C:\Users\Sami Lamti\Documents\GitHub\localizable\Backup\MethodSignatureCollection.cs">
+</Event><Event ErrorLevel="0" Project="ngenstrings" Source="..\ngenstrings\LocalizedStringTable.cs" Description="File successfully backed up as C:\Users\Sami Lamti\Documents\GitHub\localizable\Backup\LocalizedStringTable.cs">
+</Event><Event ErrorLevel="0" Project="ngenstrings" Source="..\ngenstrings\OutputFormat.cs" Description="File successfully backed up as C:\Users\Sami Lamti\Documents\GitHub\localizable\Backup\OutputFormat.cs">
+</Event><Event ErrorLevel="0" Project="ngenstrings" Source="..\ngenstrings\ngenstrings.csproj" Description="Project converted successfully">
+</Event><Event ErrorLevel="3" Project="ngenstrings" Source="..\ngenstrings\ngenstrings.csproj" Description="Converted">
+</Event><Event ErrorLevel="0" Project="ngenstrings" Source="..\ngenstrings\ngenstrings.csproj" Description="Scan complete: Upgrade not required for project files.">
+</Event></UpgradeLog>

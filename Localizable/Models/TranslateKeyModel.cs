@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Web;
 using Models;
+using System.ComponentModel.DataAnnotations;
 
 namespace Localizable.Models
 {
@@ -16,6 +17,7 @@ namespace Localizable.Models
 
         public IEnumerable<string> Translations { get; set; }
 
+        [Required]
         public string NewTranslation { get; set; }
 
         [DisplayName("Key")]

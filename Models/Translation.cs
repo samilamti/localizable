@@ -1,11 +1,30 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.Runtime.Serialization;
+using System.ComponentModel;
+using System;
 
 namespace Models
 {
     [DataContract]
     public class Translation
     {
+        private string p;
+
+        /// <summary>
+        /// Serialization constructor
+        /// </summary>
+        public Translation()
+        {
+
+        }
+
+        public Translation(string language, string value)
+        {
+            Language = language;
+            Value = value;
+            Added = DateTime.UtcNow;
+        }
+
         [DataMember, Key]
         public int Id { get; set; }
 
@@ -29,5 +48,8 @@ namespace Models
 
         [DataMember, StringLength(2)]
         public string Language { get; set; }
+
+        [DataMember, Required]
+        public DateTime Added { get; set; }
     }
 }

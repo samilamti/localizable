@@ -31,31 +31,36 @@ namespace Localizable.Controllers
                 return RedirectToAction("Translate", "Oauth");
 
             var ret = new TranslateModel();
-            using (var context = new Context())
-            {
-                var translator = context.GetTranslator(User);
-                ret.Language = translator.Language;
-            }
 
             using (var context = new Context())
             {
-                IQueryable<TranslationKey> untranslatedKeys = context.Keys;
+                ret.Language = context.GetTranslator(User).Language;
+
+                IQueryable<TranslationKey> untranslatedKeys;
                 if (skip > 0)
                 {
-                    untranslatedKeys = untranslatedKeys.Where(k => k.Id > skip);
+                    untranslatedKeys = context.Keys.Where(k => k.Id > skip);
                     if (!untranslatedKeys.Any())
                         untranslatedKeys = context.Keys;
                 }
+                else
+                    untranslatedKeys = context.Keys;
 
                 untranslatedKeys = untranslatedKeys
                     .Where(key => !key.Translations.Any(translation => translation.Language == ret.Language))
                     .Take(5);
 
-                ret.Translations = new List<TranslationModel>(
-                    untranslatedKeys.Select(key => new TranslationModel { Key = key.Key, Comment = key.Comment }).ToList());
+                ret.Translations = untranslatedKeys
+                    .Select(key => new TranslationModel { Key = key.Key, Comment = key.Comment })
+                    .ToList();
 
                 if (ret.Translations.Count > 0)
                     ret.To = untranslatedKeys.Max(k => k.Id);
+                else
+                {
+                    TempData["Message"] = "There are currently no untranslated keys. However, perhaps you could help us by voting on other people's translations? Thanks!";
+                    return RedirectToAction("Vote");
+                }
             }
 
             return View(ret);
@@ -85,12 +90,7 @@ namespace Localizable.Controllers
                         var key = context.Keys.First(k => k.Key == translation.Key);
 
                         if (translation.Value != null)
-                            key.Translations.Add(new Translation
-                                                     {
-                                                         Language = model.Language, 
-                                                         Value = translation.Value,
-                                                         Translator = translator
-                                                     });
+                            key.Translations.Add(new Translation(model.Language, translation.Value) { Translator = translator });
                         else if (translation.Untranslatable)
                         {
                             if (!context.DownvotedKeys.Any(dk => dk.Key.Id == key.Id && dk.Translator.Id == translator.Id))
@@ -102,7 +102,8 @@ namespace Localizable.Controllers
                                     context.DownvotedKeys.Where(dk => dk.Key.Id == key.Id).ToList().ForEach(dk => context.DownvotedKeys.Remove(dk));
                                     context.Keys.Remove(key);
                                 }
-                                context.DownvotedKeys.Add(new DownvotedKey {Key = key, Translator = translator});
+                                else
+                                    context.DownvotedKeys.Add(new DownvotedKey {Key = key, Translator = translator});
                             }
                         }
                     }
@@ -118,7 +119,41 @@ namespace Localizable.Controllers
         {
             using (var context = new Context())
             {
-                return View(context.Keys.Include(key => key.Translations).ToList());
+                var data = context.Keys.Include(key => key.Translations)
+                    .Where(key => key.Translations.Any())
+                    .OrderByDescending(key => key.Added)
+                    .ToList();
+
+                return View(data);
+            }
+        }
+
+        public JsonResult AddVote(int translation, string direction)
+        {
+            using (var context = new Context())
+            {
+                var translator = context.GetTranslator(User);
+                var evt = context.Events
+                    .Where(e => e.Translator.Id == translator.Id && e.ObjectId == translation && e.EventName == "vote")
+                    .FirstOrDefault();
+
+                if (evt != null)
+                    return Json(context.Values.Find(translation).RelativeScore);
+
+                context.Events.Add(new Event { 
+                    Translator = translator,
+                    EventName = "vote",
+                    ObjectId = translation
+                });
+
+                var t = context.Values.Find(translation);
+                if (direction == "up")
+                    t.UpVotes++;
+                else if (direction == "down")
+                    t.DownVotes++;
+                t.RelativeScore = t.UpVotes - t.DownVotes;
+                context.SaveChanges();
+                return Json(t.RelativeScore);
             }
         }
 
@@ -127,6 +162,11 @@ namespace Localizable.Controllers
             if (!Request.IsAuthenticated)
                 return RedirectToAction("ContributeFile", "Oauth");
 
+            return View();
+        }
+
+        public ActionResult Resources()
+        {
             return View();
         }
     }

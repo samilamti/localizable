@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Runtime.Serialization;
+using System;
 
 namespace Models
 {
@@ -15,7 +16,8 @@ namespace Models
         public TranslationKey(string key, string comment)
         {
             Key = key;
-            Comment = comment;
+            Comment = comment == "" ? null : comment;
+            Added = DateTime.UtcNow;
         }
 
         [Key]
@@ -32,5 +34,8 @@ namespace Models
 
         [DataMember]
         public int DownVotes { get; set; }
+
+        [DataMember, Required]
+        public DateTime Added { get; set; }
     }
 }

@@ -49,9 +49,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Parsers\AndroidXmlFileParserTests.cs" />
+    <Compile Include="Parsers\PListFileParserTests.cs" />
+    <Compile Include="Parsers\ResxFileParserTests.cs" />
+    <Compile Include="Parsers\StringsFileParserTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Controllers\HomeControllerTest.cs" />
-    <Compile Include="StringsParserTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="App.config" />
@@ -69,6 +71,9 @@
       <Project>{1152E924-561F-435E-8CAF-BF5E101E2D2A}</Project>
       <Name>Localizable</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Controllers\" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

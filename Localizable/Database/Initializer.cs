@@ -22,6 +22,8 @@ namespace Localizable.Database
             CreateIndex<TranslationKey>(context, "Key");
             CreateIndex<Translation>(context, "Language");
             CreateIndex<Translator>(context, "EMail");
+            CreateIndex<Event>(context, "ObjectId");
+            CreateIndex<Event>(context, "Translator_Id");
         }
 
         private static void CreateIndex<TTable>(Context context, string column)

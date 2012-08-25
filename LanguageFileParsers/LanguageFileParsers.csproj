@@ -40,8 +40,14 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="StringsParser.cs" />
+    <Compile Include="AndroidXmlFileParser.cs" />
+    <Compile Include="FileParserFacade.cs" />
+    <Compile Include="ILanguageFileParser.cs" />
+    <Compile Include="PlistFileParser.cs" />
+    <Compile Include="RegexFileParser.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ResxFileParser.cs" />
+    <Compile Include="StringsFileParser.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\ngenstrings\ngenstrings.csproj">

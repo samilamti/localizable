@@ -14,14 +14,15 @@
 <table style="border: none">
 @foreach (var key in Model)
 {
-        <tr>
+        <tr class="tk@(key.Id)">
             <th colspan="3" style="white-space: nowrap">@key.Key</th>
             <th colspan="2" style="white-space: nowrap; text-align: right">
+
             </th>
         </tr>
         foreach (var translation in key.Translations.OrderByDescending(t => t.RelativeScore))
         {
-            <tr id="translationRow@(translation.Id)">
+            <tr id="translationRow@(translation.Id)" class="tk@(key.Id)">
                 <td>@translation.Language
                 </td>
                 <td>@translation.Value
@@ -38,9 +39,11 @@
                 </td>
             </tr>
         }
-    <tr>
+    <tr class="tk@(key.Id)">
         <td colspan="5" style="border: none; text-align: right; padding-bottom: 40px">
             <a href="@Url.Action("Key", "Translate", new { id = key.Id })" style="font-size: smaller" class="button">add translation</a>
+            <a href="#" data-translationKey="@key.Id" style="font-size: smaller" class="downVoteKey button tooltip" title="<u>Mark as untranslatable</u><br/>If you feel, that the key is not general enough to translate (such as Advertisement1), or that it, for example, it contains a company name or an URL, you can indicate this issue by flagging it.">
+                <span class="ui-icon ui-icon-alert" style="float: left"></span>&nbsp;</a>
         </td>
     </tr>
 }
@@ -54,9 +57,19 @@
                 var $this = $(this);
                 var id = $this.data("translationId");
 
-                $.post('@Url.Action("Vote")', { translation: id, direction: $this.data("direction") }, function (data) {
+                $.post('@Url.Action("AddVote")', { translation: id, direction: $this.data("direction") }, function (data) {
                     $("#translationRelativeScore" + id).text(data);
                     $("#translationRow" + id).find("a.vote.button").remove();
+                });
+                return false;
+            });
+
+            $("a.downVoteKey").click(function () {
+                var $this = $(this);
+                var id = $this.data("translationKey");
+
+                $.getJSON('@Url.Action("DownVoteKey", "Translate")', { id: id }, function (data) {
+                    $("tr.tk" + id).slideUp();
                 });
                 return false;
             });

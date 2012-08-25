@@ -1,8 +1,42 @@
 ﻿@{
-    ViewBag.Title = "About Us";
+    ViewBag.Title = "About";
 }
 
-<h2>About</h2>
+<h2>What's all this then?</h2>
 <p>
-     Put content here.
+    Localizable is community-driven translation service. Specifically, it helps app developers on various platforms 
+    (iOS, WP7 and Android at the time of writing) to make their apps speak far more languages than the app developers 
+    themselves.
+</p>
+<p>
+    By utilizing the <a href="http://www.ted.com/talks/chris_anderson_how_web_video_powers_global_innovation.html" target="_blank">power of internet</a> 
+    and the willingness of intelligent individuals, we belive that we can provide a unique service.
+</p>
+<h2>How does it work?</h2>
+<p>
+    <img src="@Url.Content("~/Content/images/translation-process.png")" alt="The translation process" title="The translation process" class="tooltip" style="float: left; margin-right: 10px" />
+    When you send a file to our service to have it translated, we first extract all the keys from your file and add it to our database. 
+    This is done so that willing and able translators can visit the site at a later time and translate any keys (words/phrases) that we
+    do not already know. After we have added the keys to our database, we ask it for all available translations for those keys. If you,
+    as an example, would have uploaded a Microsoft Windows Phone 7 Resource Dictionary (<i>my file</i><b>.resx</b>), containing the key
+    "HelloWorld" and we had that key translated to French and German, we would return three files to you - one in English, one in French
+    and one in German:
+    <img src="@Url.Content("~/Content/images/language-expansion.png")" alt="Language expansion explained" title="Language expansion explained" class="tooltip" style="display: block; margin-top: 10px;" />
+</p>
+<h2 style="clear: both">Why was this made in the first place?</h2>
+<p>
+    Reading the book <a href="http://www.amazon.com/Professional-iPhone-Programming-MonoTouch-Programmer/dp/047063782X">Professional iPhone Programing with MonoTouch and .NET/C#</a>
+    and specifically the chapter on localization - Chapter 12 - Localizing for an International Audience, I got inspired to create some soft of community that could help 
+    eachother to produce better apps in terms of languages they spoke.
+</p>
+<h2>How can I help?</h2>
+<p>
+    I'm glad you asked! There are several things that would be helpful to the community at the moment. First off,
+    we could use all the translators we need, and also help spread the word. To help translate, simply go to the translation
+    page and take it from there. To help spread the word, you can opt to mention on us Twitter or on Facebook, for example,
+    using the links provided.
+</p>
+<p>
+    Second off, I'm sure that you've noticed that I'm not a graphical designer. Thus, if you would like to contribute with
+    styling and imagery, please feel free to do so!
 </p>

@@ -1,5 +1,4 @@
-﻿@model Localizable.Models.LoginToVoteModel
-@{
+﻿@{
     ViewBag.Title = "Please log in to vote";
 }
 <p>
@@ -8,4 +7,9 @@
     any of our partners below. We do this to ensure that all participants vote only
     once to maintain the site's overall quality.
 </p>
-@{Html.RenderAction("LogOn", "Oauth");}
+
+@{ Html.RenderPartial("_OauthHead"); }
+@*    <input type="hidden" name="returnUrl" value="@Url.Action("Translate", "Home")"/>
+    <input type="checkbox" name="noPublicityThanks"/>
+    <label for="noPublicityThanks">No thank you, I'd like to help people, but would not like any publicity</label> (can be changed later).*@
+@{ Html.RenderPartial("_OauthFoot"); }

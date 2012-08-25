@@ -4,8 +4,9 @@
     var isIosDevice = Regex.IsMatch(Request != null && Request.UserAgent != null ? Request.UserAgent : "", "Mozilla\\/5.0 \\(iPod|iPad|iPhone.+?\\).*?Mobile");
 }
 <p>
-    For best results, it is <b>strongly recommended</b> that you upload a file where the neutral language is English. To enable as many people as possible to contribute
-    to the site, our goal has been to translate from English to all other languages.
+    For best results, it is <b>strongly recommended</b> that you upload a file where the keys and comments are written in English. To enable as many people as possible to contribute
+    to the site, our goal has been to translate from English to all other languages. Also, please note that we recommend that you refrain from using spaces in your key
+    definition for maximum compatibility between file formats. Finally, the service expects the uploaded files to be encoded with UTF-8.
     
 </p>
 <table style="border: none">
@@ -13,26 +14,36 @@
         <td style="vertical-align: middle; border: none">
             @using (Html.BeginForm("Upload", "Translate", FormMethod.Post, new { enctype = "multipart/form-data" }))
             {
-@*                if (Request.IsAuthenticated)
-                {
+                <div id="inputForm">
                     <div class="editor-label">
-                        @Html.LabelFor(m => m.Language)    
+                        <label for="PostedFile">Select file: </label>
                     </div>
                     <div class="editor-field">
-                        @Html.TextBoxFor(m => m.Language, new { id = "targetLanguage" })    
+                        <input type="file" name="PostedFile" style="max-width: 170px; max-height: 20px;" id="qqfile" class="button"/>
                     </div>
-                    
-                    Html.RenderPartial("_targetLanguageAutoComplete", "noautosubmit");
-                }
-*@                
-                <div class="editor-label">
-                    <label for="PostedFile">Select file: </label>
-                </div>
-                <div class="editor-field">
-                    <input type="file" name="PostedFile" style="max-width: 120px; max-height: 20px;" id="qqfile" class="button"/>
-                </div>
                 
-                <span id="uploadingMessage">Translating your file ...</span>
+@*                    <div class="editor-label">
+                        <label for="PostedFile">There are already values in the file,<br />and they are written in: </label>
+                    </div>
+                    <div class="editor-field">
+                        @Html.TextBoxFor(m => m.Language, new { id = "targetLanguage", style = "max-width: 50px" })
+                        (optional)
+                    </div>
+*@
+                    <div class="editor-label">
+                        <label for="OutputFormat">Output format: </label>
+                    </div>
+                    <div class="editor-field">
+                        @Html.DropDownListFor(m => m.SelectedOutputFormat, Model.OutputFormats)
+                    </div>
+                
+                    <div class="editor-label"></div>
+                    <div class="editor-field">
+                        <a href="#" id="submitButton" class="button">Translate!</a>
+                    </div>
+                </div>  
+                
+                <div id="uploadingMessage">Translating your file ...</div>
             }
         </td>
         <td style="vertical-align: middle; border: none">
@@ -47,22 +58,47 @@
     set of files in a .zip archive for you to download. You can then import the files in your development environment.
     
     <h3>What if you don't have translations for all my keys?</h3>
-    If we lack translations, we will add a comment - <b>needs translation</b> to your key and type in the default value
+    If we lack translations, we will add a comment - <b>needs translation</b> - to your key and type in the default value
     you provided in your upload. To make this process better, you can help us by uploading already translated resource
     files, which we can use to help others.
 </p>
+
+@{Html.RenderPartial("_targetLanguageAutoComplete", "noautosubmit");}
 
 @if (!isIosDevice)
 {
     <script type="text/javascript">
         $(function () {
-            $("#qqfile").change(function () {
-                $("form").submit();
-                $(this).fadeOut(function () {
-                    $("#uploadingMessage").fadeIn();
+            $("#submitButton").click(function () {
+                $("#inputForm").slideUp(function () {
+                    $("#uploadingMessage").fadeIn(function () {
+                        checkUpload(function () {
+                            $("#uploadingMessage").fadeOut(function () {
+                                $("form input:file").val('');
+                                $("#inputForm").slideDown();
+                            });
+                        });
+                    });
+
+                    $("#uploadingMessage").fadeIn().delay(2000).fadeOut(function () {
+                        $("form input:file").val('');
+                        $("#inputForm").slideDown();
+                    });
                 });
+                $("form").submit();
+                return false;
             });
             $("#uploadingMessage").hide();
         });
+
+        function checkUpload(success) {
+            $.getJSON('@Url.Action("IsUploadComplete")', function (uploadCompleted) {
+                if (uploadCompleted)
+                    success();
+                else {
+                    setTimeout(function () { checkUpload(succes); }, 500);
+                }
+            });
+        }
     </script>
 }

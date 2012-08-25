@@ -10,15 +10,27 @@
     <h3>... or an other OpenID-provider</h3>
     @Html.TextBox("loginIdentifier", "", new { id = "loginIdentifier" })
     
-    <p/><input type="submit" value="Login using above"/>
+    <p/><a href="#" id="submitButton" class="button">Log on using above</a>
 </form>
 <script>
     $(function () {
         $("a.login").click(function () {
+            var loginProvider = $(this).text();
+            $("#OauthForm").slideUp(function () {
+                $("#OauthMessage").text('Connecting to ' + loginProvider + '...');
+                $("#OauthMessage").fadeIn();
+            });
             $("#loginIdentifier").val($(this).data("lid"));
-            $("form").submit();
+            $("#OauthForm").submit();
             return false;
         });
+        $("#submitButton").click(function () {
+            $("#OauthForm").submit();
+            return false;
+        });
+
+        $("#OauthMessage").hide();
     });
 </script>
 <hr/>
+<div id="OauthMessage"></div>

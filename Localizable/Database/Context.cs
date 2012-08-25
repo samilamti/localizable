@@ -7,10 +7,16 @@ namespace Localizable.Database
 {
     public class Context : DbContext
     {
+        public Context() : base("ApplicationServices")
+        {
+
+        }
+
         public DbSet<TranslationKey> Keys { get; set; }
         public DbSet<Translation> Values { get; set; }
         public DbSet<Translator> Translators { get; set; }
         public DbSet<DownvotedKey> DownvotedKeys { get; set; }
+        public DbSet<Event> Events { get; set; }
 
         public Translator GetTranslator(IPrincipal user)
         {

@@ -10,15 +10,16 @@
     <p>
         <b>Thank you</b> for helping us translate the texts below from <b>english</b> to @Html.TextBoxFor(m => m.Language, new { id = "targetLanguage", style = "max-width: 50px" })
     </p>
+
     if (!String.IsNullOrEmpty(Model.Language))
-    {
+                                                                                    {
         <p>
             If you don't feel comfortable in translating a certain field, just leave it blank.
         </p>
         @Html.HiddenFor(m => m.Language)
-        for (int index = 0; index < Model.Translations.Count; index++)
-        {
-            var item = Model.Translations[index];
+   for (int index = 0; index < Model.Translations.Count; index++)
+   {
+       var item = Model.Translations[index];
             <div>
                 <b>@Model.Translations[index].Key</b>
                 @if (!String.IsNullOrEmpty(item.Comment))
@@ -35,10 +36,10 @@
                 </label>
             </div>
             <br/>
-        }
+   }
 
         <hr/>
         <input type="submit" value="Submit my translations"/>
-    }
+                                                                                    }
 }
 @{ Html.RenderPartial("_targetLanguageAutoComplete", ""); }

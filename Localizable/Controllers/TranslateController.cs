@@ -21,7 +21,46 @@ namespace Localizable.Controllers
     {
         public ActionResult File()
         {
-            return View();
+            var model = new UploadModel();
+            model.OutputFormats = new List<SelectListItem> { 
+                new SelectListItem { Selected = true, Text = "Best guess, based upload", Value = OutputFormat.Unknown.ToString() },
+                new SelectListItem { Text = "Android XML files", Value = OutputFormat.AndroidXml.ToString() },
+                new SelectListItem { Text = "iOS PList files", Value = OutputFormat.PList.ToString() },
+                new SelectListItem { Text = "Microsoft ResX files", Value = OutputFormat.ResX.ToString() },
+                new SelectListItem { Text = "iOS Strings files", Value = OutputFormat.Strings.ToString() },
+                //new SelectListItem { Text = "iOS Custstom XML files", Value = OutputFormat.Xml.ToString() }
+            };
+
+            return View(model);
+        }
+
+        [HttpGet]
+        public ActionResult DownVoteKey(int id)
+        {
+            if (!Request.IsAuthenticated)
+                return Json(false, JsonRequestBehavior.AllowGet);
+
+            using (var context = new Database.Context())
+            {
+                var contributor = context.GetTranslator(User);
+                if (context.DownvotedKeys.Any(k => k.Key.Id == id && k.Translator.Id == contributor.Id))
+                    return Json(false, JsonRequestBehavior.AllowGet);
+
+                var key = context.Keys.Find(id);
+                key.DownVotes++;
+                if (key.DownVotes > 5)
+                {
+                    context.Values.Where(v => v.Key.Id == key.Id).ToList().ForEach(v => context.Values.Remove(v));
+                    context.DownvotedKeys.Where(dk => dk.Key.Id == key.Id).ToList().ForEach(dk => context.DownvotedKeys.Remove(dk));
+                    context.Keys.Remove(key);
+                }
+                else
+                    context.DownvotedKeys.Add(new DownvotedKey { Key = key, Translator = contributor });
+
+                context.SaveChanges();
+            }
+
+            return Json(true, JsonRequestBehavior.AllowGet);
         }
 
         private bool TryGetInputStream(HttpPostedFileBase file, out Stream inputStream)
@@ -36,71 +75,11 @@ namespace Localizable.Controllers
             return inputStream != null;
         }
 
-        [HttpPost] public ActionResult UploadTranslatedFile(HttpPostedFileBase file, string language)
-        {
-            if (!Request.IsAuthenticated)
-                return RedirectToAction("UploadTranslatedFile", "Oauth");
-
-           Stream inputStream;
-           if (!TryGetInputStream(file, out inputStream))
-            {
-                ModelState.AddModelError("file", "Unable to read file");
-                return new EmptyResult();
-            }
-
-            var tables = new List<LocalizedStringTable>();
-
-            var fileName = GetFileName(file);
-
-            if (fileName.EndsWith(".dll"))
-            {
-                tables.AddRange(ngenstrings.MainClass.ParseDll(inputStream).Values);
-            }
-            else
-            {
-                using(var reader = new StreamReader(inputStream))
-                {
-                    tables.Add(StringsParser.ExtractTable(reader.ReadToEnd()));
-                }
-            }
-
-            using (var context = new Context())
-            {
-                var translator = context.GetTranslator(User);
-
-                // 1. Add all keys to db
-                var foundKeys = new List<TranslationKey>();
-                foreach (var source in tables)
-                    foreach (var key in source.Keys)
-                    {
-                        var tkey = context.Keys.FirstOrDefault(tk => tk.Key == key);
-                        if (tkey == null)
-                        {
-                            tkey = new TranslationKey(key, source[key].Comment);
-                            context.Keys.Add(tkey);
-                        }
-                        foundKeys.Add(tkey);
-                        var value = source[key];
-                        if (!String.IsNullOrEmpty(value.Value) &&
-                            !context.Values.Any(v => v.Value == value.Value && v.Language == language))
-                            context.Values.Add(new Translation
-                                                   {
-                                                       Key = tkey, 
-                                                       Value = value.Value, 
-                                                       Language = language,
-                                                       Translator = translator
-                                                   });
-                    }
-                context.SaveChanges();
-            }
-
-            TempData["Message"] = "Thank you!";
-            return RedirectToAction("Index", "Home");
-        }
-
         [HttpPost]
         public ActionResult Upload(UploadModel model)
         {
+            Session["UploadStarted"] = DateTime.UtcNow;
+
             var addValues = Request.IsAuthenticated && !String.IsNullOrEmpty(model.Language);
 
             Stream inputStream;
@@ -110,125 +89,59 @@ namespace Localizable.Controllers
                 return new EmptyResult();
             }
 
-            var tables = new List<LocalizedStringTable>();
-
             var fileName = GetFileName(model.PostedFile);
-            var outputFormat = GetOutputFormat(fileName);
-            var sourceLanguage = GetSourceLanguage(fileName);
+            var tables = MvcApplication.FileParser.ExtractStringTables(inputStream, fileName);
 
-            if (fileName.EndsWith(".dll"))
+            MvcApplication.TranslationService.AddKeysToDatabase(tables);
+
+            if (addValues)
+                MvcApplication.TranslationService.AddTranslationsToDatabase(tables, User, model.Language);
+
+            OutputFormat outputFormat;
+            if (!Enum.TryParse<OutputFormat>(model.SelectedOutputFormat, out outputFormat) || outputFormat == OutputFormat.Unknown)
+                outputFormat = GuessOutputFormat(fileName);
+
+            if (addValues)
             {
-                tables.AddRange(ngenstrings.MainClass.ParseDll(inputStream).Values);
-            }
-            else
-            {
-                using(var reader = new StreamReader(inputStream))
-                {
-                    tables.Add(StringsParser.ExtractTable(reader.ReadToEnd()));
-                }
+                TempData["Message"] = "Thank you for adding your knowledge to ours!";
+                return RedirectToAction("Index", "Home");
             }
 
-            using (var context = new Context())
-            {
-                var translator = addValues ? context.GetTranslator(User) : null;
+            var outputTables = MvcApplication.TranslationService.ProduceOutputTables(tables);
+            var outputStream = MvcApplication.CompressionService.ProduceOutputStream(outputTables, outputFormat);
 
-                // 1. Add all keys to db
-                var foundKeys = new List<TranslationKey>();
-                foreach(var source in tables)
-                foreach (var key in source.Keys)
-                {
-                    var tkey = context.Keys.FirstOrDefault(tk => tk.Key == key);
-                    if (tkey == null)
-                    {
-                        tkey = new TranslationKey(key, source[key].Comment);
-                        context.Keys.Add(tkey);
-                    }
-                    foundKeys.Add(tkey);
-
-                    if (addValues)
-                    {
-                        var value = source[key];
-                        if (!String.IsNullOrEmpty(value.Value) &&
-                            !context.Values.Any(v => v.Value == value.Value && v.Language == sourceLanguage))
-                            context.Values.Add(new Translation
-                                                   {
-                                                       Key = tkey, 
-                                                       Value = value.Value, 
-                                                       Language = model.Language,
-                                                       Translator = translator
-                                                   });
-                    }
-                }
-                context.SaveChanges();
-
-                if (addValues)
-                {
-                    TempData["Message"] = "Thank you for adding your knowledge to ours!";
-                    return RedirectToAction("Index", "Home");
-                }
-
-                // 2. Produce output
-                var languages = foundKeys
-                    .SelectMany(collectionSelector => collectionSelector.Translations)
-                    .Select(t => t.Language)
-                    .Distinct();
-                var translators = foundKeys
-                    .SelectMany(collectionSelector => collectionSelector.Translations)
-                    .Where(t => t.Translator != null)
-                    .Select(t => t.Translator)
-                    .Distinct()
-                    .Select(t => t.FullName == t.EMail ? t.EMail : String.Format("{0} ({1})", t.FullName, t.EMail));
-                var dict = languages.ToDictionary(language => language, language => new LocalizedStringTable("undefined"));
-                foreach (var translationKey in foundKeys)
-                {
-                    foreach (var translation in translationKey.Translations.OrderByDescending(t => t.RelativeScore))
-                    {
-                        var key = translation.Key.Key;
-                        var table = dict[translation.Language];
-
-                        if (table.ContainsKey(key))
-                            continue;
-
-                        table.Add(key, new LocalizedString
-                        {
-                            Comment = translation.Key.Comment,
-                            Key = key,
-                            Value = translation.Value
-                        });
-                    }
-                }
-
-                // 3. Produce zip in format
-                using (var zip = new ZipFile())
-                {
-                    foreach (var language in dict.Keys)
-                    {
-                        zip.AddEntry(Path.Combine(language, "Localizable.strings"), dict[language].ToString(outputFormat, String.Join(", ", translators)));
-                    }
-                    var ms = new MemoryStream();
-                    zip.Save(ms);
-                    ms.Position = 0;
-                    return File(ms, "application/zip", "translations.zip");
-                }
-            }
+            Session["UploadEnded"] = DateTime.UtcNow;
+            return File(outputStream, "application/zip", "translations.zip");
         }
 
-        private string GetSourceLanguage(string fileName)
+        [HttpGet]
+        public JsonResult IsUploadComplete()
         {
-            var match = Regex.Match(fileName, "resources\\.(?<language>.+?)-.+\\.resx");
-            if (match.Success)
-                return match.Groups["language"].Value;
-            return "en";
+            var uploadStartedValue = Session["UploadStarted"];
+            if (uploadStartedValue == null) return Json(false); 
+            var uploadEndedValue = Session["UploadEnded"];
+
+            var uploadStarted = (DateTime)uploadStartedValue;
+            var uploadEnded = (DateTime)uploadEndedValue;
+
+            if (uploadEnded > uploadStarted)
+            {
+                Session.Remove("UploadStarted");
+                Session.Remove("UploadEnded");
+                return Json(true);
+            }
+
+            return Json(false);
         }
 
-        private OutputFormat GetOutputFormat(string fileName)
+        private OutputFormat GuessOutputFormat(string fileName)
         {
             if(fileName.EndsWith(".plist"))
                 return OutputFormat.PList;
             if (fileName.EndsWith(".resx"))
                 return OutputFormat.ResX;
             if (fileName.EndsWith(".xml"))
-                return OutputFormat.Xml;
+                return OutputFormat.AndroidXml;
             return OutputFormat.Strings;
         }
 
@@ -264,18 +177,19 @@ namespace Localizable.Controllers
         [HttpPost]
         public ActionResult Key(TranslateKeyModel model)
         {
+            if (String.IsNullOrEmpty(model.NewTranslation))
+            {
+                TempData["Message"] = "Please provide your translation before hitting the 'Submit translation' key";
+                return RedirectToAction("Key", new { id = model.KeyId });
+            }
+
             using (var context = new Context())
             {
                 var translator = context.GetTranslator(User);
                 translator.Language = model.Language;
 
                 var key = context.Keys.Find(model.KeyId);
-                key.Translations.Add(new Translation
-                                         {
-                                             Language = model.Language, 
-                                             Translator = translator, 
-                                             Value = model.NewTranslation
-                                         });
+                key.Translations.Add(new Translation(model.Language, model.NewTranslation) { Translator = translator });
                 context.SaveChanges();
                 TempData["Message"] = "Thank you!";
             }
